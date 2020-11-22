@@ -1,0 +1,11 @@
+[package]
+name = "svg2png"
+version = "0.0.0"
+authors = ["yuta0801 <unknown>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+deno_core = "0.67.0"
