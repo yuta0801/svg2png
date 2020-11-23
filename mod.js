@@ -1,4 +1,4 @@
-var pluginPath = [
+const pluginPath = [
   "target",
   "debug",
   (Deno.build.os + "" === "windows" ? "" : "lib") +
@@ -11,20 +11,9 @@ var pluginPath = [
 ].join("/");
 
 // NOTE: Deno.close(pluginId) once u r done
-var pluginId = Deno.openPlugin(pluginPath);
-var { asyncOp: asyncOpId, syncOp: syncOpId } = Deno.core.ops();
+const pluginId = Deno.openPlugin(pluginPath);
+const { renderOp: renderOpId } = Deno.core.ops();
 
-export function syncOpWrapper(zeroCopy) {
-  return Deno.core.dispatch(syncOpId, zeroCopy);
-}
-
-export function asyncOpWrapper(zeroCopy) {
-  return new Promise(function (resolve, reject) {
-    try {
-      Deno.core.setAsyncHandler(asyncOpId, resolve);
-      Deno.core.dispatch(asyncOpId, zeroCopy);
-    } catch (err) {
-      return reject(err);
-    }
-  });
+export function render(input, buffer) {
+  return Deno.core.dispatch(renderOpId, input, buffer);
 }

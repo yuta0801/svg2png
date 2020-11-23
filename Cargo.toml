@@ -9,3 +9,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 deno_core = "0.67.0"
+resvg = "0.11.0"
+usvg = "0.11.0"
+png = "0.16.7"
