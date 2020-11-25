@@ -7,13 +7,12 @@ pub fn deno_plugin_init(interface: &mut dyn Interface) {
 }
 
 pub fn op_render(_interface: &mut dyn Interface, zero_copy: &mut [ZeroCopyBuf]) -> Op {
-    let mut exec = || -> Result<usize, String> {
+    let mut exec = || -> Result<_, _> {
         let mut iter = zero_copy.iter_mut();
         let input = iter.next().ok_or("missing input")?;
-        let mut buf = iter.next().ok_or("missing buffer")?;
         let input =
             std::str::from_utf8(&input).map_err(|err| format!("invalid string: {}", err))?;
-        render(&input, &mut buf)
+        render(&input)
     };
 
     match exec() {
@@ -21,11 +20,11 @@ pub fn op_render(_interface: &mut dyn Interface, zero_copy: &mut [ZeroCopyBuf]) 
             println!("{}", message);
             Op::Sync(Box::new([]))
         }
-        Ok(len) => Op::Sync(Box::new(len.to_be_bytes())),
+        Ok(png) => Op::Sync(png.into_boxed_slice()),
     }
 }
 
-fn render(svg: &str, buf: &mut [u8]) -> Result<usize, String> {
+fn render(svg: &str) -> Result<Vec<u8>, String> {
     let image = {
         let options = usvg::Options::default();
         let tree = usvg::Tree::from_str(svg, &options)
@@ -48,12 +47,5 @@ fn render(svg: &str, buf: &mut [u8]) -> Result<usize, String> {
             .map_err(|err| format!("failed to encode to png: {}", err))?;
     }
 
-    let len = png.len();
-
-    if buf.len() < len {
-        Err("not enough buffer size".to_string())
-    } else {
-        buf[0..len].copy_from_slice(&png);
-        Ok(len)
-    }
+    Ok(png)
 }
