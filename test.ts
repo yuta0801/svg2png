@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.77.0/testing/asserts.ts";
-import { render } from "./mod.js";
+import { render } from "./mod.ts";
 
 Deno.test({
   name: "can render deno logo successfully",

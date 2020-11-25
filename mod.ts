@@ -19,16 +19,18 @@ const pluginPath = join(
 
 // NOTE: Deno.close(pluginId) once u r done
 const pluginId = Deno.openPlugin(pluginPath);
+// @ts-ignore Deno.core still doesn't have type definition
 const { renderOp: renderOpId } = Deno.core.ops();
 
-export function render(svg) {
+export function render(svg: string | Uint8Array) {
   const input = convertStringToArrayBuffer(svg);
+  // @ts-ignore same as above
   const png = Deno.core.dispatch(renderOpId, input);
   if (!png) throw new Error("Failed to render svg");
   return png;
 }
 
-function convertStringToArrayBuffer(svg) {
+function convertStringToArrayBuffer(svg: string | Uint8Array) {
   if (typeof svg !== "string") return svg;
   return new TextEncoder().encode(svg);
 }
